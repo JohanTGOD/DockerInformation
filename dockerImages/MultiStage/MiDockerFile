@@ -1,0 +1,9 @@
+FROM maven:3.5-alpine as myBuilder
+COPY app /somePlace
+RUN cd /somePlace && \
+    mvn package
+FROM openjdk:8-alpine
+COPY --from=myBuilder /somePlace/target/my-app-1.0-SNAPSHOT.jar /myPath/app.jar
+CMD java -jar /myPath/app.jar
+
+

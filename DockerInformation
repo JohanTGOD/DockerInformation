@@ -1,0 +1,114 @@
+QUE ES DOCKER
+
+Es una herramienta que permite desplegar aplicaciones en contendeores de forma rapida y portable
+
+
+ARQUITECTURA
+	Docker Host = Es en donde instale docker, si lo instalo en mi pc ese será mi Docker Host si lo instalo en AWS ese será mi Docker Host
+		-Docker Daemon - Server("El que presta todos los servivios de docker")
+		-DockerCLI - Cliente
+		-Rest API
+			¿Como funciona?->El <Cliente> escribe el comando, lo recibe el <API>, que se lo envia al <Servidor-Docker Daemon> en este paso se genero una petición
+					y la respuesta se da en el orden contrario es decir <Servidor-Docker Daemon> <API> <Cliente>
+
+
+QUE ES UNA IMAGEN Y SUS COMANDOS
+	viven dentro del Docker Host , una imagen es un paquete que contiene todas las configuraciones necesarias
+	Una imagen se componen por capaz(N número de capaz) :
+					LOS COMANDOS SE ESCRIBEN EN MAYUSCULA
+							      FROM -> Definir el sistema operativo
+					   	 	      RUN -> que va haber luego del sistema operativo, como instalaciones en ese sistema operatiovo
+							      CMD ->Son comandos que se van a ejecutar cuando el comando exista
+								    Puedo porner el script directamente o generar un sh el cual va a ser ejecutado por el CMD
+								    Lo que va a ejecutar o lo que va a levantar
+										ESTAS CAPÁZ SON SOLO DE MODO LECTURA
+	Las imagenes se crean a travez del <Dockerfile>
+	para buscar imagenes docker images | grep <palabra inicial de la busqueda>
+	Otros comnados en el Dockerfile:
+		COPY:Sirve para copiar lo que tengo en mi pc o repositorio y pasarselo al contenedor
+			Ejemplo: COPY index.html /var/www/html
+					el primero es la ruta de mi archivo en MI MAQUINA este caso el index.html, despues del espacio es la ruta del contenedor, quiero mi archivo en este ruta index.html
+		ADD: Sirve tambien para copiar pero se usa para copiar informacion de una respectiva URL y pasarlo al contenedor ejemplo una URL de una imagen
+		WORKDIR: Es la ruta del contenedor que voy a utilizar
+			. el punto es para especificarle que voy a trabajar sobre la ruta establecida en el WORKDIR 
+			Ejemplo: COPY <el archivo de mi maquina> <.> es la ruta del contendero en donde va a esta la copia del mismo
+		ENV: Declarar variables de entorno
+		LABEL: Descripcion de la imagen
+		USER : Sirve para ver que usuario esta realizando la tarea, darle permisos a ese usuario y ese tipo de configuraciones
+		VOLUME: Poner la data persistente en el contenedor y no se borre
+		EXPOSE: Sirve para especificar el puerto por donde va a correr se recomiemda usar las que existen por defecto porque sino tocaria ir a las configuraciones ejemplo apache y cambiarselas
+			por defecto existe puertos tcp y udp
+				ejemplo: EXPOSE 80/tcp
+					 EXPOSE 80/udp	
+
+		> significa enviar el valor de la izquierda a una nueva ruta
+		>> significa que no me borre lo que ya tiene y pongalo debajo
+		Borrar varias imagines al tiempo
+			docker images -f dangling=true -q | xargs docker rmi
+				acá voy a borrar por las images dangling
+				-f significa filtrar
+				-q significa que solo muestre el id o que tome el id de las imagenes 
+				xargs un comando de linux para borrar (creo)
+		
+		COMANDOS PARA CREAR UNA IMAGEN A PARTIR DE UN Dockerfile
+		        docker build -t <nombre de la imagen> .
+                	el build es para que construta la imagen  --- el -t es para el nombre de la inmagen o de la version --- y el punto del final es para que tome el directorio actual y busque un archivo llamado Dockerfile
+       		        para generar versiones sobre una imagen entonces-> docker build -t <nombre de una imagen>:número o versión .
+ 		ELIMINAR IMAGENES
+			ejemplo: docker rmi <nombre de la imagen con su respectiva version> <si va a borrar varias al mismo tiempo solo es dejar el espacio y especificar la otra imagen>
+		CREAR UNA IMAGEN A PARTIR DE UN NOMRE DISTINTO AL Dockerfile
+			docker build -t <nombre que le voy a dar a esa image :version> -f <nombre de mi dockerfile> .
+				el -f significa flag y es lo que me permite jalarme otro Dockerfile
+
+
+QUE ES UN CONTENEDOR
+	Es una capa final la cual se encargará de ejecutar en tiempo real de las capaz anteriores
+	ESTA CAPA ES DE ESCRITURA - CAMBIOS TEMPORALES
+		el contenedor tiene la imagen es decir las 3 capas anteriores
+		volumenes = almacenar la informaciónm para que no se borre
+		redes = para la comunicación
+
+
+CONTAINER VS MAQUINAS VIRTUALES
+	La ventaja de container es menos pesada que una maquina virtual
+	Puedo eliminar el contenedor cuando quiera y lo recreo cuando quiera , en cambio yo elimino una maquina virtual, tengo que volver a instalar la iso, configurar la ram, etc
+	El contenedor me da lo que necesito y no instala más de lo que yo mencione en el DockerFile, mientras que unca maquina virtual viene con Block de notas, word, chrome,paint y uno no necesita eso 
+		solo lo que quiere instalar y ya por ejemplo un contendero con Centos solo tiene eso no tiene más por lo que es mas liviana , mas rapida
+	Es un proceso del equipo y no una maquina dentro de otra
+
+		 		
+QUE ES UN TAG
+	Una forma de manejar las versiones de la imagenes a descargar
+	ejemplo-> docker pull mongo:<Número de la version>
+
+	
+
+
+
+COMANDOS EN UN CONTENEDOR
+	docker run -d --name <nombre del contenedor> <nombre de la imagen con su version corrrespondiente>
+		ejemplo docker run -d --name miPrimerContenedor mysql:5.3
+			-d significa que voy a correrlo en el fondo, luego sigue un espacio con el nombre que le quiera dar a ese contendor, espacio la referencia de la imagen que haya construido o que haya descargado
+	Para borrar un contenedor:
+		docker rm -fv <nombre del contenedor>
+	Borrar varios contenedores al mismo tiempo:
+		docker ps -q | xargs docker rm -f
+			-q es para filtrar por el id del contenedor
+	Docker run mas estructurado:
+		docker run -d --name <nombreContenedor> -p 80:80 <nombre de la imagen exacta si tiene version debe ir con la respectiva version>
+			-d que corra en el fondo
+			-p especificar los puertos: el primer numero es el puerto de mi maquina despues de los : es el puerto del contenedor en este caso es el 80 porque es el puerto de apache y solo corre sobre esos puertos
+				si quisiera modificar el puerto tendria que generar en el Dockerfile un EXPOSE especificar el puerto y ese puerto lo deberia cambiar en las configuraciones de apache para que corra de forma correcta
+	Entrar al contenedor: docker exec -ti <nombre del contenedor> bash
+					-ti terminal interactivo
+					-bash que nos brinde en forma de bash
+			      docker exec -u root -ti <nombre del contenedor>
+					-u es para que el contenedor corra con el usuario en modo admin	
+	Ejecutar contendor con una variable de entorno:
+		docker run -d --name <el nomber del contenedor> -e "pruebas=12333" <imagen>
+NOTA
+	DANGLING IMAGES:
+		Es cuando reconstruyo una imagen con el mismo nombre que ya existia y la pone como <none> --- imagenes huerfanas	
+MULTISTAGE BUILD: Se identidica cuando un from tiene un as y se le pone un alias a ese from 
+		  Permite que la imagen docker no sea tan pensada ejecute lo que debe ejecutar(como dependencias y constrit jar) y se lo pase a la imagen que lo va a ejecutar el cual solo necesita lo ultimo y no todas las instancias
+
