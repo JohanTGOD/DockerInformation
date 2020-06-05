@@ -116,6 +116,4 @@ NOTA
 MULTISTAGE BUILD: Se identidica cuando un from tiene un as y se le pone un alias a ese from 
 		  Permite que la imagen docker no sea tan pensada, ejecute lo que debe ejecutar(como dependencias y constrit jar) y se lo pase a la siguiente capa FROMn(todo esto va dentro del mismo Dockerfile)
                   que lo va a ejecutar,esto se utiliza para que sea mas ligero,para configurar de una mejor manera un proyecto, es decir, si quieres java con maven o con gradle lo configuras de esta manera de una forma mas facil
-		  esto permite que sea mas ligera,combiar imagenes(esto no es recomendable mezclar porque si, todo tiene un objetivo la idea no es hacer un sancocho)
-
-
+		  esto permite que sea mas ligera,combiar imagenes(esto no es recomendable mezclar porque si, todo tiene un objetivo la idea no es hacer un sancocho) .
