@@ -1,0 +1,4 @@
+FROM centos
+ENV some value
+RUN useradd johanUser
+USER johanUser

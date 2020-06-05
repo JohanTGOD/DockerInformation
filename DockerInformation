@@ -92,6 +92,14 @@ COMANDOS EN UN CONTENEDOR
 	docker run -d --name <nombre que deseo darle al  contenedor> <nombre de la imagen con su version correspondiente>
 		ejemplo docker run -d --name miPrimerContenedor mysql:5.3
 			-d significa que voy a correrlo en el fondo, luego sigue un espacio con el nombre que le quiera dar a ese contendor, espacio la referencia de la imagen que haya construido o que haya descargado
+
+	En algunas ocaciones veras algo como esto:
+		docker run -d -ti --name <nombre del contendero> <nombre de la imagen>
+			el- ti se coloca para mantener el contenedor vivo,esto es debido que algunos Dockerfile no definieron la capa de CMD por lo que apenas despliega el contenedor este se cierra.
+			tambien se utiliza para realizar ejecicios de practica donde no quieras ejecutar la  capa CMD y solo quieras mantener vivo el contenedor con las configuraciones realizadas
+			ti  se usa normalmente en imágenes de sistemas operativo.
+			Por ejemplo, el CMD de la imagen de centos es /bin/bash. Si creas un container con esa imagen, por ejemplo: docker run -d --name centos centos , verás que muere. Por el contrario, si le agregas ti,
+		        lo que va a suceder es que el ti va abrir una terminal interactiva usando bash, y por eso mantiene vivo al contenedor.
 	Para borrar un contenedor:
 		docker rm -fv <nombre del contenedor>
 	Borrar varios contenedores al mismo tiempo:
